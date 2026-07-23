@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Netboard – Anmelden</title>
+<link rel="icon" href="/favicon.ico">
+<style>
+  :root{
+    --paper:#f4f5f7; --surface:#ffffff; --ink:#1a1d24; --ink2:#565b66;
+    --ink3:#8a909c; --rule:#e4e6ea; --rule2:#d3d6db; --link:#20489b;
+    --acc:#20489b; --dead:#c0392b;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --paper:#0e1014; --surface:#171a21; --ink:#e6e8ee; --ink2:#a4abb8;
+      --ink3:#6b7280; --rule:#232833; --rule2:#2f3540; --link:#8fb0f0; --acc:#8fb0f0; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(900px 500px at 50% -10%, color-mix(in srgb, var(--acc) 14%, transparent), transparent 70%),
+      var(--paper);
+    color:var(--ink); font:14px/1.5 var(--mono); padding:24px}
+  .card{width:100%; max-width:360px; background:var(--surface);
+    border:1px solid var(--rule); border-radius:16px; padding:30px 28px;
+    box-shadow:0 20px 60px rgba(0,0,0,.18)}
+  .brand{display:flex; align-items:center; gap:11px; margin-bottom:22px}
+  .logo{width:34px; height:34px; flex:none}
+  .logo svg{width:100%; height:100%; display:block}
+  .logo rect{fill:var(--ink)} .logo .q rect{fill:var(--surface)} .logo .a{fill:#4C7DF0}
+  h1{font-size:16px; margin:0}
+  .sub{color:var(--ink3); font-size:12px; margin:2px 0 0}
+  label{display:block; font-size:12px; color:var(--ink2); margin:14px 0 6px}
+  input{width:100%; font:13px/1.4 var(--mono); color:var(--ink);
+    background:var(--paper); border:1px solid var(--rule2); border-radius:8px;
+    padding:11px 12px}
+  input:focus{outline:none; border-color:var(--acc)}
+  button{width:100%; margin-top:20px; font:600 13px/1 var(--mono); color:#fff;
+    background:var(--acc); border:0; border-radius:8px; padding:12px; cursor:pointer}
+  button:disabled{opacity:.6; cursor:default}
+  .err{margin-top:14px; color:var(--dead); font-size:12px; min-height:16px}
+</style>
+</head>
+<body>
+  <form class="card" id="f" autocomplete="on">
+    <div class="brand"><span class="logo"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7"/><g class="q"><rect x="7" y="7" width="8.5" height="8.5" rx="2.2"/><rect x="16.5" y="7" width="8.5" height="8.5" rx="2.2"/><rect x="7" y="16.5" width="8.5" height="8.5" rx="2.2"/></g><rect class="a" x="16.5" y="16.5" width="8.5" height="8.5" rx="2.2"/></svg></span>
+      <div><h1>Netboard</h1><p class="sub">Bitte anmelden</p></div></div>
+    <label for="u">Benutzer</label>
+    <input id="u" name="username" autocomplete="username" autofocus>
+    <label for="p">Passwort</label>
+    <input id="p" name="password" type="password" autocomplete="current-password">
+    <div id="twofa" hidden>
+      <label for="c">Code aus der App</label>
+      <input id="c" name="code" inputmode="numeric" autocomplete="one-time-code"
+             placeholder="6-stelliger Code oder Ersatzcode">
+    </div>
+    <button id="btn" type="submit">Anmelden</button>
+    <div class="err" id="err"></div>
+  </form>
+<script>
+  const f = document.getElementById("f"), err = document.getElementById("err"),
+        btn = document.getElementById("btn");
+  f.addEventListener("submit", async e => {
+    e.preventDefault();
+    err.textContent = ""; btn.disabled = true;
+    try{
+      const r = await fetch("/api/auth/login", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ username: f.username.value, password: f.password.value,
+                               code: f.code ? f.code.value : "" })
+      });
+      const d = await r.json().catch(() => ({}));
+      if(r.ok && d.ok){ location.href = "/"; return; }
+      if(d.need_2fa){
+        // Zweiter Schritt: Feld einblenden und Fokus hinlegen.
+        document.getElementById("twofa").hidden = false;
+        document.querySelector(".sub").textContent = "Zwei-Faktor-Bestätigung";
+        btn.textContent = "Bestätigen";
+        document.getElementById("c").focus();
+        err.textContent = d.error || "";
+        btn.disabled = false;
+        return;
+      }
+      err.textContent = d.error || "Anmeldung fehlgeschlagen.";
+    }catch(_){ err.textContent = "Server nicht erreichbar."; }
+    btn.disabled = false;
+  });
+</script>
+</body>
+</html>

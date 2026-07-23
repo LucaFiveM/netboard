@@ -1,0 +1,33 @@
+services:
+  netboard:
+    build: .
+    image: netboard:latest
+    container_name: netboard
+    restart: unless-stopped
+
+    # Pflicht: nur im Host-Netzwerk sieht der Scanner das echte LAN
+    # inklusive MAC-Adressen und Hersteller. Im Bridge-Netz fände er
+    # ausschließlich andere Container.
+    network_mode: host
+
+    volumes:
+      # Einstellungen überleben Neustart und Neubau.
+      - ./data:/data
+
+    # Lokale Namen (z. B. vcenter01.fritz.box) auflösen: Docker ersetzt das
+    # DNS des Hosts im Container gern durch öffentliche Server, die keine
+    # .fritz.box-Namen kennen. Netboard fragt zwar ersatzweise den Router
+    # selbst – wer ganz sichergehen will, trägt hier den Router als DNS ein.
+    # dns:
+    #   - 192.168.178.1
+    # Oder einzelne Namen fest verdrahten:
+    # extra_hosts:
+    #   - "vcenter01.fritz.box:192.168.178.9"
+
+    # Alles Weitere wird in der Weboberfläche eingerichtet.
+    # Diese Variablen sind reine Startwerte für den allerersten Boot und
+    # überspringen dann den Einrichtungsassistenten – normalerweise leer lassen.
+    # environment:
+    #   NETBOARD_SUBNETS: "192.168.178.0/24"
+
+    # Erreichbar unter http://<host-ip>:8888

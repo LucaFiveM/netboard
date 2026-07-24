@@ -1,8 +1,0 @@
-fastapi==0.115.6
-uvicorn[standard]==0.34.0
-httpx==0.28.1
-asyncssh==2.24.0
-pyvmomi==9.1.0.0
-cryptography>=42
-# QR-Codes für die Zwei-Faktor-Einrichtung – lokal erzeugt, ohne Fremddienst.
-segno

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img"
+     aria-label="Netboard">
+  <title>Netboard</title>
+  <!-- Die Marke ist das Produkt: ein Board aus Kacheln, eine davon greifst du.
+       Vier Felder, damit es bei 16 px noch als Raster lesbar bleibt. -->
+  <rect width="32" height="32" rx="7" fill="#17191E"/>
+  <g fill="#FFFFFF" fill-opacity=".92">
+    <rect x="7"  y="7"  width="8.5" height="8.5" rx="2.2"/>
+    <rect x="16.5" y="7"  width="8.5" height="8.5" rx="2.2"/>
+    <rect x="7"  y="16.5" width="8.5" height="8.5" rx="2.2"/>
+  </g>
+  <rect x="16.5" y="16.5" width="8.5" height="8.5" rx="2.2" fill="#4C7DF0"/>
+</svg>
